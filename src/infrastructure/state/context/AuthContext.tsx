@@ -1,14 +1,7 @@
-import { createContext, ReactNode, useContext, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { User } from "../stores/types";
-import { useAuthStore } from "../stores/userStore";
-
-interface AuthContextType {
-  user: User | null;
-  isSignedIn: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
+import { ReactNode, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../stores/userStore';
+import { AuthContext } from './useAuthContext';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, isSignedIn } = useAuthStore();
@@ -16,19 +9,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const isLoginPage = location.pathname === "/login";
+    const isLoginPage = location.pathname === '/login';
 
     if (!isSignedIn && !isLoginPage) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
 
     if (isSignedIn && isLoginPage) {
-      navigate("/");
+      navigate('/');
       return;
     }
 
-    console.log("Usuario autenticado (contexto):", user);
+    console.log('Usuario autenticado (contexto):', user);
   }, [isSignedIn, user, location, navigate]);
 
   return (
@@ -36,12 +29,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuthContext debe usarse dentro de un AuthProvider");
-  }
-  return context;
 };
